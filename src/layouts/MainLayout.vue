@@ -7,6 +7,7 @@
         <q-toolbar-title> Quasar App </q-toolbar-title>
 
         <div>Quasar v{{ $q.version }}</div>
+        <q-avatar color="red" text-color="white" icon="directions" />
       </q-toolbar>
     </q-header>
 
@@ -26,6 +27,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useQuasar } from 'quasar';
 import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
 
 const linksList: EssentialLinkProps[] = [
@@ -78,4 +80,7 @@ const leftDrawerOpen = ref(false);
 function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 }
+
+const $q = useQuasar();
+console.log($q);
 </script>
