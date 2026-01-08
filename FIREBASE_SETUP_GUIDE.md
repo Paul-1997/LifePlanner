@@ -101,12 +101,12 @@ service cloud.firestore {
 
 ```javascript
 const firebaseConfig = {
-  apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  authDomain: "lifeplanner-xxxxx.firebaseapp.com",
-  projectId: "lifeplanner-xxxxx",
-  storageBucket: "lifeplanner-xxxxx.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:xxxxxxxxxxxxxxxxxxxx"
+  apiKey: 'AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  authDomain: 'lifeplanner-xxxxx.firebaseapp.com',
+  projectId: 'lifeplanner-xxxxx',
+  storageBucket: 'lifeplanner-xxxxx.appspot.com',
+  messagingSenderId: '123456789012',
+  appId: '1:123456789012:web:xxxxxxxxxxxxxxxxxxxx',
 };
 ```
 
@@ -227,26 +227,26 @@ boot: ['i18n', 'axios', 'firebase'],  // 加入 'firebase'
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
+
     // 只有登入用戶可以讀寫自己的資料
     match /tasks/{taskId} {
-      allow read, write: if request.auth != null 
+      allow read, write: if request.auth != null
         && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null 
+      allow create: if request.auth != null
         && request.auth.uid == request.resource.data.userId;
     }
-    
+
     match /routineCheckIns/{checkInId} {
-      allow read, write: if request.auth != null 
+      allow read, write: if request.auth != null
         && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null 
+      allow create: if request.auth != null
         && request.auth.uid == request.resource.data.userId;
     }
-    
+
     match /focusSessions/{sessionId} {
-      allow read, write: if request.auth != null 
+      allow read, write: if request.auth != null
         && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null 
+      allow create: if request.auth != null
         && request.auth.uid == request.resource.data.userId;
     }
   }
@@ -311,7 +311,7 @@ async function testWrite() {
 async function testRead() {
   try {
     const querySnapshot = await getDocs(collection(db, 'test'));
-    const docs = querySnapshot.docs.map(doc => ({
+    const docs = querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
@@ -334,13 +334,15 @@ A: Firebase 的 API Key 是設計為公開的，安全性由 Firestore 規則和
 ### Q: 免費額度夠用嗎？
 
 A: 對於個人使用，免費額度綽綽有餘：
+
 - Firestore: 50,000 讀取/天、20,000 寫入/天
 - Authentication: 無限制
 - Storage: 1 GB
 
 ### Q: 如何備份資料？
 
-A: 
+A:
+
 1. 使用 Firebase Console 的匯出功能
 2. 使用 `firebase-admin` SDK 寫腳本
 3. 在 App 內實作匯出為 JSON 功能
@@ -386,5 +388,3 @@ firebase emulators:start
 ---
 
 _更新時間：2026-01-07_
-
-
