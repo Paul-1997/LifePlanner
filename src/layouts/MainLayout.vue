@@ -1,86 +1,30 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
-
-        <q-toolbar-title> Quasar App </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
-        <q-avatar color="red" text-color="white" icon="directions" />
-      </q-toolbar>
-    </q-header>
-
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item-label header> Essential Links </q-item-label>
-
-        <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
-      </q-list>
-    </q-drawer>
+  <q-layout view="lHh Lpr lFf" class="bg-background">
+    <!-- Desktop Sidebar (Hidden on Mobile) -->
+    <Sidebar :drawer="leftDrawerOpen" v-if="$q.screen.gt.sm" />
 
     <q-page-container>
-      <router-view />
+      <div :class="$q.screen.lt.sm ? 'q-pb-xl' : ''">
+         <router-view />
+      </div>
     </q-page-container>
+
+    <!-- Mobile Bottom Nav -->
+    <q-footer v-if="$q.screen.lt.sm" bordered class="bg-surface text-primary">
+      <q-tabs no-caps active-color="primary" indicator-color="transparent" class="text-grey-5">
+        <q-route-tab to="/" icon="dashboard" label="Home" />
+        <q-route-tab to="/tasks" icon="check_circle" label="Tasks" />
+        <q-route-tab to="/focus" icon="timer" label="Focus" />
+        <q-route-tab to="/routines" icon="repeat" label="Habits" />
+      </q-tabs>
+    </q-footer>
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useQuasar } from 'quasar';
-import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
+import { provide, ref } from 'vue';
+import Sidebar from 'components/Sidebar.vue';
 
-const linksList: EssentialLinkProps[] = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev',
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework',
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev',
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev',
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev',
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev',
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev',
-  },
-];
-
-const leftDrawerOpen = ref(false);
-
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
-}
-
-const $q = useQuasar();
-console.log($q);
+const leftDrawerOpen = ref(true);
+provide('isDrawerOpen', leftDrawerOpen);
 </script>
