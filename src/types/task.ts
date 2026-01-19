@@ -38,47 +38,49 @@ export interface TaskChangeLog {
   details: string;
 }
 
+export interface Subtask {
+  id: string;
+  title: string;
+  status: 'todo' | 'done';
+  completed: boolean;
+  completedAt?: Date | undefined;
+}
+
 /**
  * 任務（核心資料模型）
  */
 export interface Task {
   id: string;
   title: string;
-  description?: string;
-
-  // === 狀態（用於一次性任務）===
+  note?: string | undefined;
   status: TaskStatus;
-
-  // === 四象限分類 ===
-  quadrant: EisenhowerQuadrant;
-
-  // === 分類與標籤 ===
-  category?: string; // 例如：工作、學習、運動、生活
-  tags?: string[];
+  completed: boolean;
+  quadrant?: EisenhowerQuadrant | undefined;
+  category?: string | undefined; // 例如：工作、學習、運動、生活
+  tags?: string[] | undefined;
 
   // === 時間 ===
-  dueDate?: Date; // 截止日期
-  reminderAt?: Date; // 提醒時間
+  dueDate?: Date | undefined; // 截止日期
+  reminderAt?: Date | undefined; // 提醒時間
   createdAt: Date;
   updatedAt: Date;
-  completedAt?: Date;
+  completedAt?: Date | undefined;
 
   // === 週期性任務配置 ===
-  routine?: RoutineConfig;
+  routine?: RoutineConfig | undefined;
 
   // === 階層結構 ===
-  parentId?: string; // 父任務 ID（用於子任務）
-  subtasks?: Task[]; // 子任務陣列
-  order: number; // 排序權重
+  subtasks?: Subtask[] | undefined;
+  order?: number | undefined;
 
   // === 變更日誌 ===
   changeLog: TaskChangeLog[];
 
   // === 整合（未來擴展）===
-  googleCalendarEventId?: string; // Google Calendar 事件 ID
+  googleCalendarEventId?: string | undefined; // Google Calendar 事件 ID
 
   // === Firebase 用（雲端同步時需要）===
-  userId?: string; // 所屬用戶 ID
+  userId?: string | undefined; // 所屬用戶 ID
 }
 
 /**
@@ -88,7 +90,7 @@ export type CreateTaskInput = Omit<
   Task,
   'id' | 'createdAt' | 'updatedAt' | 'changeLog' | 'subtasks'
 > & {
-  subtasks?: CreateTaskInput[];
+  subtasks?: { title: string; status?: 'todo' | 'done' }[];
 };
 
 /**

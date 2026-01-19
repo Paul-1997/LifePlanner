@@ -5,6 +5,7 @@ import type { RoutineCheckIn, CreateCheckInInput } from 'src/types/routine';
 import type { FocusSession, CreateFocusSessionInput } from 'src/types/focus';
 import { generateUUID } from 'src/utils/id';
 import { formatDate } from 'src/utils/date';
+import { LocalStorage } from 'quasar';
 
 const useTaskStore = defineStore('task', () => {
   // ===== State =====
@@ -12,8 +13,12 @@ const useTaskStore = defineStore('task', () => {
   const routineCheckIns = ref<RoutineCheckIn[]>([]);
   const focusSessions = ref<FocusSession[]>([]);
 
-  // ===== Getters（多個頁面使用，格式一致）=====
+  // ===== State（從 LocalStorage 初始化）=====
+  tasks.value = LocalStorage.getItem('tasks') || [];
+  routineCheckIns.value = LocalStorage.getItem('routineCheckIns') || [];
+  focusSessions.value = LocalStorage.getItem('focusSessions') || [];
 
+  // ===== Getters（多個頁面使用，格式一致）=====
   /**
    * 所有未完成任務（HomePage, TasksPage 都會用）
    */
@@ -82,18 +87,32 @@ const useTaskStore = defineStore('task', () => {
   };
 
   // ===== Actions（任務 CRUD）=====
-
+  const saveTasksToLocalStorage = () => {
+    LocalStorage.set('tasks', tasks.value);
+    LocalStorage.set('routineCheckIns', routineCheckIns.value);
+    LocalStorage.set('focusSessions', focusSessions.value);
+  };
   /**
    * 新增任務
    */
   const addTask = (input: CreateTaskInput): string => {
     const { now, id } = generateDateAndUUID();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const { subtasks, ...restInput } = input;
+
+    const processedSubtasks =
+      subtasks?.map((sub) => ({
+        id: generateUUID(),
+        title: sub.title,
+        status: sub.status || 'todo',
+        completed: false,
+      })) || [];
 
     const newTask: Task = {
       ...restInput,
+      subtasks: processedSubtasks,
       id,
+      completed: false,
       createdAt: now,
       updatedAt: now,
       changeLog: [
@@ -106,6 +125,7 @@ const useTaskStore = defineStore('task', () => {
     };
 
     tasks.value.push(newTask);
+    saveTasksToLocalStorage();
     return id;
   };
 
@@ -128,6 +148,7 @@ const useTaskStore = defineStore('task', () => {
         },
       ],
     });
+    saveTasksToLocalStorage();
   };
 
   /**
@@ -139,6 +160,7 @@ const useTaskStore = defineStore('task', () => {
     routineCheckIns.value = routineCheckIns.value.filter((c) => c.taskId !== id);
     // 同時刪除相關的專注記錄
     focusSessions.value = focusSessions.value.filter((s) => s.taskId !== id);
+    saveTasksToLocalStorage();
   };
 
   /**
@@ -234,7 +256,6 @@ const useTaskStore = defineStore('task', () => {
     session.interrupted = interrupted;
   };
 
-  // ===== Return =====
   return {
     // State
     tasks,
